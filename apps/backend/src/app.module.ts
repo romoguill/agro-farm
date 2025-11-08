@@ -12,8 +12,8 @@ import { DATABASE_CONNECTION } from "./database/database-connection";
 @Module({
   imports: [
     ConfigModule.forRoot({}),
-    DatabaseModule,
     AuthModule.forRootAsync({
+      imports: [DatabaseModule],
       useFactory: (database: NodePgDatabase) => ({
         auth: betterAuth({
           database: drizzleAdapter(database, {
