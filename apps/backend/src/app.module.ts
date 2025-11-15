@@ -1,8 +1,8 @@
-import { Module } from "@nestjs/common";
+import { BadRequestException, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard, AuthModule } from "@thallesp/nestjs-better-auth";
-import { betterAuth } from "better-auth";
+import { AuthContext, betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { TRPCModule } from "nestjs-trpc";
@@ -10,6 +10,7 @@ import { DATABASE_CONNECTION } from "./database/database-connection";
 import { DatabaseModule } from "./database/database.module";
 import { TodosModule } from "./todos/todos.module";
 import { UsersModule } from "./users/users.module";
+import { AppController } from "./app.controller";
 
 @Module({
   imports: [
@@ -18,13 +19,26 @@ import { UsersModule } from "./users/users.module";
       imports: [DatabaseModule, ConfigModule],
       useFactory: (database: NodePgDatabase, configService: ConfigService) => ({
         auth: betterAuth({
+          basePath: "/api/auth",
           database: drizzleAdapter(database, {
             provider: "pg",
           }),
-          trustedOrigins: [configService.getOrThrow("UI_URL")],
+          trustedOrigins: [
+            configService.getOrThrow("UI_URL"),
+            "http://localhost:3000",
+          ],
           emailAndPassword: {
             enabled: true,
           },
+          // onAPIError: {
+          //   throw: false,
+          //   onError: (error: unknown, ctx: AuthContext<BetterAuthOptions>) => {
+          //     console.error(error, ctx);
+          //     throw new BadRequestException(
+          //       error instanceof Error ? error.message : "Unknown error",
+          //     );
+          //   },
+          // },
         }),
       }),
       inject: [DATABASE_CONNECTION, ConfigService],
@@ -35,7 +49,7 @@ import { UsersModule } from "./users/users.module";
     UsersModule,
     TodosModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,

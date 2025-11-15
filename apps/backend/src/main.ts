@@ -1,6 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import type { Server as HttpServer } from "http";
+
 declare const module: {
   hot?: {
     accept: () => void;
@@ -11,6 +12,12 @@ declare const module: {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bodyParser: false });
   const port = Number(process.env.PORT ?? 3000);
+
+  app.setGlobalPrefix("api");
+  app.enableCors({
+    origin: process.env.UI_URL,
+    credentials: true,
+  });
   await app.listen(port);
 
   const shutdown = async () => {
