@@ -1,8 +1,12 @@
-import { BadRequestException, Module } from "@nestjs/common";
+import { ForbiddenException, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
-import { AuthGuard, AuthModule } from "@thallesp/nestjs-better-auth";
-import { AuthContext, betterAuth, BetterAuthOptions } from "better-auth";
+import {
+  AuthGuard,
+  AuthHookContext,
+  AuthModule,
+} from "@thallesp/nestjs-better-auth";
+import { betterAuth, Status } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { TRPCModule } from "nestjs-trpc";
@@ -11,6 +15,7 @@ import { DatabaseModule } from "./database/database.module";
 import { TodosModule } from "./todos/todos.module";
 import { UsersModule } from "./users/users.module";
 import { AppController } from "./app.controller";
+import { createAuthMiddleware } from "better-auth/api";
 
 @Module({
   imports: [
@@ -30,15 +35,18 @@ import { AppController } from "./app.controller";
           emailAndPassword: {
             enabled: true,
           },
-          // onAPIError: {
-          //   throw: false,
-          //   onError: (error: unknown, ctx: AuthContext<BetterAuthOptions>) => {
-          //     console.error(error, ctx);
-          //     throw new BadRequestException(
-          //       error instanceof Error ? error.message : "Unknown error",
-          //     );
-          //   },
-          // },
+          onAPIError: {
+            throw: true,
+          },
+          hooks: {
+            after: createAuthMiddleware(async (ctx) => {
+              console.log(ctx.context.returned);
+              // @ts-expect-error - better-auth handling error
+              if (ctx.context?.returned?.statusCode === 422) {
+                throw new ForbiddenException("Invalid credentials");
+              }
+            }),
+          },
         }),
       }),
       inject: [DATABASE_CONNECTION, ConfigService],

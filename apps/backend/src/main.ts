@@ -1,6 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import type { Server as HttpServer } from "http";
+import { AuthExceptionFilter } from "./filters/auth-exception.filter";
 
 declare const module: {
   hot?: {
@@ -18,6 +19,7 @@ async function bootstrap() {
     origin: process.env.UI_URL,
     credentials: true,
   });
+  app.useGlobalFilters(new AuthExceptionFilter());
   await app.listen(port);
 
   const shutdown = async () => {

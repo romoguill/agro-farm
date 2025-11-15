@@ -6,6 +6,7 @@ export class AppController {
   @Get("/health")
   @AllowAnonymous()
   health() {
+    console.log("ok");
     return { status: "ok" };
   }
 }
