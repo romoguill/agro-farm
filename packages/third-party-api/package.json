@@ -16,10 +16,9 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "build": "pnpm run clean && tsc -p tsconfig.build.json",
-    "prepare": "pnpm run build",
-    "build:esm": "echo \"deprecated\"",
-    "build:cjs": "echo \"deprecated\""
+    "prepare": "pnpm run build"
   },
   "devDependencies": {
     "@nestjs/common": "^11.0.0",
