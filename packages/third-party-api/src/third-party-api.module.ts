@@ -1,6 +1,6 @@
 import { DynamicModule, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { ThirdPartyApiService } from "./third-party-apis.service";
+import { ThirdPartyApiService } from "./third-party-api.service";
 
 @Module({
   imports: [],

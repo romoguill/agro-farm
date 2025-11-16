@@ -18,6 +18,7 @@ import { DATABASE_CONNECTION } from "./database/database-connection";
 import { DatabaseModule } from "./database/database.module";
 import { TodosModule } from "./todos/todos.module";
 import { UsersModule } from "./users/users.module";
+import { MarketDataModule } from "./market-data/market-data.module";
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { UsersModule } from "./users/users.module";
     }),
     UsersModule,
     TodosModule,
+    MarketDataModule,
   ],
   controllers: [AppController],
   providers: [

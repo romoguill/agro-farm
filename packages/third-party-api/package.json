@@ -1,0 +1,8 @@
+{
+  "name": "@repo/third-party-api",
+  "version": "1.0.0",
+  "private": true,
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0"
+  }
+}
