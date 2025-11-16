@@ -1,4 +1,10 @@
-import { ForbiddenException, Module } from "@nestjs/common";
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  Logger,
+  Module,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard, AuthModule } from "@thallesp/nestjs-better-auth";
@@ -18,36 +24,55 @@ import { UsersModule } from "./users/users.module";
     ConfigModule.forRoot({}),
     AuthModule.forRootAsync({
       imports: [DatabaseModule, ConfigModule],
-      useFactory: (database: NodePgDatabase, configService: ConfigService) => ({
-        auth: betterAuth({
+      useFactory: (database: NodePgDatabase) => {
+        const logger = new Logger(AuthModule.name);
+
+        const auth = betterAuth({
           basePath: "/api/auth",
           database: drizzleAdapter(database, {
             provider: "pg",
           }),
-          trustedOrigins: [
-            configService.getOrThrow("UI_URL"),
-            "http://localhost:3000",
-          ],
+          advanced: { disableOriginCheck: true },
           emailAndPassword: {
             enabled: true,
           },
           onAPIError: {
             throw: true,
           },
+
           hooks: {
             // eslint-disable-next-line @typescript-eslint/require-await
             after: createAuthMiddleware(async (ctx) => {
               if (ctx.context.returned instanceof APIError) {
-                if (ctx.context.returned.statusCode === 422) {
-                  throw new ForbiddenException(
-                    "Email already in use. Try a different email, or sign in.",
-                  );
+                switch (ctx.context.returned.statusCode) {
+                  case 422:
+                    throw new ForbiddenException(
+                      "Email already in use. Try a different email, or sign in.",
+                    );
+                  case 400:
+                    throw new UnauthorizedException("Invalid credentials");
+                  default:
+                    logger.error(ctx.context.returned);
+                    throw new InternalServerErrorException(
+                      `Unknown error ocurred in the authentication process: ${
+                        ctx.context.returned.message
+                      }`,
+                    );
                 }
               }
+
+              logger.error(ctx.context.returned);
+              throw new InternalServerErrorException(
+                "Unknown error ocurred in the authentication process",
+              );
             }),
           },
-        }),
-      }),
+        });
+
+        return {
+          auth,
+        };
+      },
       inject: [DATABASE_CONNECTION, ConfigService],
     }),
     TRPCModule.forRoot({
