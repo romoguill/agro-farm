@@ -5,7 +5,7 @@ import {
   Module,
   UnauthorizedException,
 } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard, AuthModule } from "@thallesp/nestjs-better-auth";
 import { betterAuth } from "better-auth";
@@ -16,9 +16,9 @@ import { TRPCModule } from "nestjs-trpc";
 import { AppController } from "./app.controller";
 import { DATABASE_CONNECTION } from "./database/database-connection";
 import { DatabaseModule } from "./database/database.module";
+import { MarketDataModule } from "./market-data/market-data.module";
 import { TodosModule } from "./todos/todos.module";
 import { UsersModule } from "./users/users.module";
-import { MarketDataModule } from "./market-data/market-data.module";
 
 @Module({
   imports: [
@@ -61,20 +61,12 @@ import { MarketDataModule } from "./market-data/market-data.module";
                     );
                 }
               }
-
-              logger.error(ctx.context.returned);
-              throw new InternalServerErrorException(
-                "Unknown error ocurred in the authentication process",
-              );
             }),
           },
         });
-
-        return {
-          auth,
-        };
+        return { auth };
       },
-      inject: [DATABASE_CONNECTION, ConfigService],
+      inject: [DATABASE_CONNECTION],
     }),
     TRPCModule.forRoot({
       autoSchemaFile: "../../packages/trpc/src/server",

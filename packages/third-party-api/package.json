@@ -2,7 +2,32 @@
   "name": "@repo/third-party-api",
   "version": "1.0.0",
   "private": true,
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "pnpm run clean && tsc -p tsconfig.build.json",
+    "prepare": "pnpm run build",
+    "build:esm": "echo \"deprecated\"",
+    "build:cjs": "echo \"deprecated\""
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@types/node": "^22.10.7"
+  },
   "peerDependencies": {
-    "@nestjs/common": "^11.0.0"
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0"
   }
 }

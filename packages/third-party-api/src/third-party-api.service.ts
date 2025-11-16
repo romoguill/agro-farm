@@ -47,5 +47,7 @@ export class ThirdPartyApiService {
     return data;
   }
 
-  getCurrentMarketPrice(symbol: keyof typeof CROPS_API) {}
+  getCurrentMarketPrice(symbol: keyof typeof CROPS_API) {
+    return { symbol, price: 100 };
+  }
 }
