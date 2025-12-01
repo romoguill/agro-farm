@@ -19,6 +19,7 @@ import { DatabaseModule } from "./database/database.module";
 import { MarketDataModule } from "./market-data/market-data.module";
 import { TodosModule } from "./todos/todos.module";
 import { UsersModule } from "./users/users.module";
+import { RedisModule } from "./redis/redis.module";
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { UsersModule } from "./users/users.module";
     TRPCModule.forRoot({
       autoSchemaFile: "../../packages/trpc/src/server",
     }),
+    RedisModule,
     UsersModule,
     TodosModule,
     MarketDataModule,
