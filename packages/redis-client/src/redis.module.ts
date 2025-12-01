@@ -4,16 +4,22 @@ import { Redis } from "ioredis";
 
 export const REDIS_CONNECTION = "redis_connection";
 
+let redisClient: Redis;
+
 @Module({
   imports: [],
   providers: [
     {
       provide: REDIS_CONNECTION,
       useFactory: (configService: ConfigService) => {
-        return new Redis({
-          host: configService.getOrThrow("REDIS_HOST"),
-          port: configService.getOrThrow("REDIS_PORT"),
-        });
+        if (!redisClient) {
+          redisClient = new Redis({
+            host: configService.getOrThrow("REDIS_HOST"),
+            port: configService.getOrThrow("REDIS_PORT"),
+          });
+        }
+
+        return redisClient;
       },
       inject: [ConfigService],
     },
