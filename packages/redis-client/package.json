@@ -5,13 +5,13 @@
   "files": [
     "dist"
   ],
-  "types": "./dist/redis.module.d.ts",
-  "main": "./dist/redis.module.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
   "exports": {
     ".": {
-      "types": "./dist/redis.module.d.ts",
-      "require": "./dist/redis.module.js",
-      "default": "./dist/redis.module.js"
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {

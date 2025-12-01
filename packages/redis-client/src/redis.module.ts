@@ -1,8 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Redis } from "ioredis";
-
-export const REDIS_CONNECTION = "redis_connection";
+import { REDIS_CONNECTION } from "./tokens";
+import Redis from "ioredis";
 
 let redisClient: Redis;
 

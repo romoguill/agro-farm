@@ -20,6 +20,10 @@
     "build": "pnpm run clean && tsc -p tsconfig.build.json",
     "prepare": "pnpm run build"
   },
+  "dependencies": {
+    "@repo/redis-client": "workspace:*",
+    "jwt-decode": "^4.0.0"
+  },
   "devDependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
