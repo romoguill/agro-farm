@@ -8,7 +8,6 @@ import { ConfigService } from "@nestjs/config";
 
 type MatbaCedentials = {
   username: string;
-  email: string;
   password: string;
 };
 
@@ -26,9 +25,6 @@ export class ThirdPartyApiService {
 
   private readonly MATBA_API_LOGIN_URL: string;
   private readonly MATBA_API_MARKET_URL: string;
-  private readonly MATBA_API_USERNAME: string;
-  private readonly MATBA_API_PASSWORD: string;
-  private readonly MATBA_API_EMAIL: string;
 
   constructor(private readonly configService: ConfigService) {
     this.MATBA_API_LOGIN_URL = this.configService.getOrThrow(
@@ -37,11 +33,6 @@ export class ThirdPartyApiService {
     this.MATBA_API_MARKET_URL = this.configService.getOrThrow(
       "MATBA_API_MARKET_URL"
     );
-    this.MATBA_API_USERNAME =
-      this.configService.getOrThrow("MATBA_API_USERNAME");
-    this.MATBA_API_EMAIL = this.configService.getOrThrow("MATBA_API_EMAIL");
-    this.MATBA_API_PASSWORD =
-      this.configService.getOrThrow("MATBA_API_PASSWORD");
   }
 
   private async getToken(
@@ -58,7 +49,9 @@ export class ThirdPartyApiService {
     const body = await response.json();
 
     if (!response.ok) {
-      this.logger.error(JSON.stringify(body));
+      this.logger.error(
+        "Failed to get token from Matba API: " + JSON.stringify(body)
+      );
       throw new Error("Failed to get token");
     }
 
@@ -87,13 +80,12 @@ export class ThirdPartyApiService {
     return body;
   }
 
-  async getCurrentMarketPrice(symbol: keyof typeof CROPS_API) {
+  async getCurrentMarketPrice(
+    symbol: keyof typeof CROPS_API,
+    credentials: MatbaCedentials
+  ) {
     try {
-      const token = await this.getToken({
-        username: this.MATBA_API_USERNAME,
-        email: this.MATBA_API_EMAIL,
-        password: this.MATBA_API_PASSWORD,
-      });
+      const token = await this.getToken(credentials);
 
       const data = await this.getData(symbol, token.access);
       return data;
