@@ -90,6 +90,8 @@ export class ThirdPartyApiService {
     symbol: keyof typeof CROPS_API,
     token: string
   ): Promise<MatbaMarketData> {
+    this.logger.debug("Getting market data for symbol: " + symbol);
+
     const response = await fetch(
       `${this.MATBA_API_MARKET_URL}${CROPS_API[symbol]}`,
       {
@@ -107,6 +109,8 @@ export class ThirdPartyApiService {
       this.logger.error(JSON.stringify(body));
       throw new InternalServerErrorException("Failed to get market data");
     }
+
+    this.logger.debug("Market data received: " + JSON.stringify(body));
 
     return body;
   }
